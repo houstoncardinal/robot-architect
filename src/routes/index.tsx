@@ -256,6 +256,73 @@ function Index() {
           </aside>
         </section>
 
+        {/* Live build streams */}
+        {nodes.length > 0 && (
+          <section className="mt-6">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-amber">
+                ▣ live build · {buildTitle || "in progress"}
+              </div>
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                streaming from {nodes.length} agents
+              </div>
+            </div>
+            <div ref={buildRef} className="grid max-h-[280px] gap-3 overflow-y-auto sm:grid-cols-2 lg:grid-cols-4">
+              {nodes.map((n) => {
+                const stream = builds[n.robot.codename] ?? [];
+                return (
+                  <div
+                    key={n.robot.id}
+                    className="flex flex-col rounded-xl border bg-panel/40 p-3 backdrop-blur"
+                    style={{ borderColor: `color-mix(in oklab, var(--${n.robot.color}) 50%, var(--panel-edge))` }}
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="text-sm">{n.robot.emoji}</span>
+                      <span
+                        className="font-mono text-[10px] font-bold tracking-wider"
+                        style={{ color: `var(--${n.robot.color})` }}
+                      >
+                        {n.robot.codename}
+                      </span>
+                      <span
+                        className={`ml-auto h-1.5 w-1.5 rounded-full ${
+                          n.status === "working" ? "flicker" : ""
+                        }`}
+                        style={{
+                          background:
+                            n.status === "done"
+                              ? "var(--lime)"
+                              : n.status === "working"
+                                ? `var(--${n.robot.color})`
+                                : "var(--muted-foreground)",
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-1 font-mono text-[10px] leading-snug text-foreground/85">
+                      <AnimatePresence initial={false}>
+                        {stream.map((b) => (
+                          <motion.div
+                            key={b.id}
+                            initial={{ opacity: 0, x: -6 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="flex gap-1"
+                          >
+                            <span style={{ color: `var(--${n.robot.color})` }}>›</span>
+                            <span className="flex-1">{b.line.replace(`[${n.robot.codename}] `, "")}</span>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                      {stream.length === 0 && (
+                        <div className="text-muted-foreground/50">awaiting task…</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* Roster */}
         {nodes.length > 0 && (
           <section className="mt-6">
