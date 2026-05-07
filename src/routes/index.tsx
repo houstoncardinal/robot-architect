@@ -40,12 +40,18 @@ function Index() {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [logs]);
 
+  useEffect(() => {
+    if (buildRef.current) buildRef.current.scrollTop = buildRef.current.scrollHeight;
+  }, [builds]);
+
   function reset() {
     setNodes([]);
     setLogs([]);
     setPulses([]);
     setArtifact(null);
     setProgress(0);
+    setBuilds({});
+    setBuildTitle("");
   }
 
   async function launch(directive: string) {
