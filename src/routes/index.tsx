@@ -12,6 +12,7 @@ type NodeState = { robot: RobotRole; status: "spawning" | "thinking" | "working"
 type LogEntry = { id: number; from: string; text: string; tone?: "info" | "ok" | "warn"; t: string };
 type Pulse = { id: number; from: string; to: string };
 type Artifact = { title: string; lines: string[] };
+type BuildLine = { id: number; from: string; line: string };
 
 const SUGGESTIONS = [
   "Do my calculus homework on integration",
