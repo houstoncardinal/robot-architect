@@ -93,6 +93,12 @@ function Index() {
       ]);
     } else if (step.type === "status") {
       setNodes((n) => n.map((x) => (x.robot.id === step.id ? { ...x, status: step.status } : x)));
+    } else if (step.type === "build") {
+      setBuildTitle(step.title);
+      setBuilds((b) => {
+        const arr = b[step.from] ?? [];
+        return { ...b, [step.from]: [...arr, { id: ++idRef.current, from: step.from, line: step.line }] };
+      });
     } else if (step.type === "artifact") {
       setArtifact({ title: step.title, lines: step.lines });
     }
