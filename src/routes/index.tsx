@@ -315,16 +315,18 @@ function sleep(ms: number) {
 function stepDelay(step: SwarmStep): number {
   switch (step.type) {
     case "spawn":
-      return 450;
-    case "message":
       return 280;
+    case "message":
+      return 160;
     case "status":
-      return 180;
+      return 100;
     case "log":
-      return 220;
-    case "artifact":
-      return 600;
-    default:
+      return 130;
+    case "build":
       return 200;
+    case "artifact":
+      return 500;
+    default:
+      return 150;
   }
 }
