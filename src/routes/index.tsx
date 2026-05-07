@@ -30,7 +30,10 @@ function Index() {
   const [pulses, setPulses] = useState<Pulse[]>([]);
   const [artifact, setArtifact] = useState<Artifact | null>(null);
   const [progress, setProgress] = useState(0);
+  const [builds, setBuilds] = useState<Record<string, BuildLine[]>>({});
+  const [buildTitle, setBuildTitle] = useState<string>("");
   const logRef = useRef<HTMLDivElement>(null);
+  const buildRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
 
   useEffect(() => {
