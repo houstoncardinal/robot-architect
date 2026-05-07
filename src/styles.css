@@ -63,8 +63,24 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --background: oklch(0.16 0.03 260);
+  --foreground: oklch(0.96 0.01 240);
+  --cyan: oklch(0.82 0.18 200);
+  --magenta: oklch(0.72 0.25 340);
+  --amber: oklch(0.85 0.17 80);
+  --lime: oklch(0.85 0.2 140);
+  --grid: oklch(0.28 0.04 260);
+  --panel: oklch(0.2 0.035 262);
+  --panel-edge: oklch(0.32 0.05 260);
+  --color-cyan: var(--cyan);
+  --color-magenta: var(--magenta);
+  --color-amber: var(--amber);
+  --color-lime: var(--lime);
+  --color-panel: var(--panel);
+  --color-panel-edge: var(--panel-edge);
+  --color-grid: var(--grid);
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
