@@ -4,20 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -62,59 +48,80 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.16 0.03 260);
-  --foreground: oklch(0.96 0.01 240);
-  --cyan: oklch(0.82 0.18 200);
-  --magenta: oklch(0.72 0.25 340);
-  --amber: oklch(0.85 0.17 80);
-  --lime: oklch(0.85 0.2 140);
-  --grid: oklch(0.28 0.04 260);
-  --panel: oklch(0.2 0.035 262);
-  --panel-edge: oklch(0.32 0.05 260);
-  --color-cyan: var(--cyan);
-  --color-magenta: var(--magenta);
-  --color-amber: var(--amber);
-  --color-lime: var(--lime);
+  --radius: 0.75rem;
+  /* Obsidian + champagne gold + ivory — couture, museum-grade */
+  --background: oklch(0.14 0.012 60);
+  --foreground: oklch(0.96 0.015 80);
+  --gold: oklch(0.84 0.13 86);
+  --gold-deep: oklch(0.68 0.14 70);
+  --champagne: oklch(0.92 0.06 88);
+  --platinum: oklch(0.86 0.01 90);
+  --ivory: oklch(0.96 0.02 85);
+  --rose: oklch(0.72 0.13 25);
+  --emerald: oklch(0.68 0.12 165);
+  --sapphire: oklch(0.62 0.13 240);
+  --obsidian: oklch(0.10 0.01 60);
+  --panel: oklch(0.18 0.014 60);
+  --panel-edge: oklch(0.32 0.025 70);
+
+  /* Legacy aliases (kept so existing tokens still resolve) */
+  --cyan: var(--sapphire);
+  --magenta: var(--rose);
+  --amber: var(--gold);
+  --lime: var(--emerald);
+  --grid: oklch(0.24 0.018 70);
+
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-champagne: var(--champagne);
+  --color-platinum: var(--platinum);
+  --color-ivory: var(--ivory);
   --color-panel: var(--panel);
   --color-panel-edge: var(--panel-edge);
-  --color-grid: var(--grid);
-  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --color-cyan: var(--sapphire);
+  --color-magenta: var(--rose);
+  --color-amber: var(--gold);
+  --color-lime: var(--emerald);
+
+  --font-display: "Cormorant Garamond", "Playfair Display", ui-serif, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --card: oklch(0.2 0.035 262);
-  --card-foreground: oklch(0.96 0.01 240);
-  --popover: oklch(0.2 0.035 262);
-  --popover-foreground: oklch(0.96 0.01 240);
-  --primary: oklch(0.82 0.18 200);
-  --primary-foreground: oklch(0.16 0.03 260);
-  --secondary: oklch(0.24 0.04 262);
-  --secondary-foreground: oklch(0.96 0.01 240);
-  --muted: oklch(0.24 0.04 262);
-  --muted-foreground: oklch(0.7 0.03 250);
-  --accent: oklch(0.72 0.25 340);
-  --accent-foreground: oklch(0.16 0.03 260);
-  --destructive: oklch(0.65 0.25 25);
+
+  --card: var(--panel);
+  --card-foreground: var(--foreground);
+  --popover: var(--panel);
+  --popover-foreground: var(--foreground);
+  --primary: var(--gold);
+  --primary-foreground: var(--obsidian);
+  --secondary: oklch(0.22 0.018 65);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.22 0.018 65);
+  --muted-foreground: oklch(0.68 0.02 75);
+  --accent: var(--gold);
+  --accent-foreground: var(--obsidian);
+  --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(0.98 0.003 247);
-  --border: oklch(0.32 0.05 260);
-  --input: oklch(0.32 0.05 260);
-  --ring: oklch(0.82 0.18 200);
-  --chart-1: oklch(0.82 0.18 200);
-  --chart-2: oklch(0.72 0.25 340);
-  --chart-3: oklch(0.85 0.17 80);
-  --chart-4: oklch(0.85 0.2 140);
-  --chart-5: oklch(0.7 0.2 280);
-  --sidebar: oklch(0.18 0.03 262);
-  --sidebar-foreground: oklch(0.96 0.01 240);
-  --sidebar-primary: oklch(0.82 0.18 200);
-  --sidebar-primary-foreground: oklch(0.16 0.03 260);
-  --sidebar-accent: oklch(0.24 0.04 262);
-  --sidebar-accent-foreground: oklch(0.96 0.01 240);
-  --sidebar-border: oklch(0.32 0.05 260);
-  --sidebar-ring: oklch(0.82 0.18 200);
+  --border: var(--panel-edge);
+  --input: var(--panel-edge);
+  --ring: var(--gold);
+  --chart-1: var(--gold);
+  --chart-2: var(--rose);
+  --chart-3: var(--emerald);
+  --chart-4: var(--sapphire);
+  --chart-5: var(--champagne);
+  --sidebar: var(--obsidian);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--gold);
+  --sidebar-primary-foreground: var(--obsidian);
+  --sidebar-accent: var(--panel);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--panel-edge);
+  --sidebar-ring: var(--gold);
 }
 
 @theme inline {
   --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 }
 
@@ -123,27 +130,84 @@
     border-color: var(--color-border);
   }
 
-  body {
-    background-color: var(--color-background);
+  html, body {
+    background: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  body {
     background-image:
-      radial-gradient(circle at 20% 10%, oklch(0.82 0.18 200 / 0.08), transparent 50%),
-      radial-gradient(circle at 80% 90%, oklch(0.72 0.25 340 / 0.08), transparent 50%),
-      linear-gradient(oklch(0.28 0.04 260 / 0.4) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(0.28 0.04 260 / 0.4) 1px, transparent 1px);
-    background-size: auto, auto, 40px 40px, 40px 40px;
+      radial-gradient(ellipse 80% 60% at 50% -10%, oklch(0.84 0.13 86 / 0.10), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 100% 100%, oklch(0.62 0.13 240 / 0.06), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 0% 100%, oklch(0.72 0.13 25 / 0.05), transparent 60%),
+      linear-gradient(180deg, oklch(0.12 0.01 60) 0%, oklch(0.16 0.014 60) 100%);
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
   }
 }
+
+/* Luxe utilities */
+.glass {
+  background: linear-gradient(180deg, oklch(0.22 0.018 65 / 0.55), oklch(0.16 0.014 60 / 0.55));
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--gold) 18%, var(--panel-edge));
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.04),
+    0 30px 60px -30px oklch(0 0 0 / 0.6);
+}
+
+.gold-text {
+  background: linear-gradient(180deg, var(--champagne) 0%, var(--gold) 45%, var(--gold-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gold-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+  opacity: 0.55;
+}
+
+.hairline {
+  border: 1px solid color-mix(in oklab, var(--gold) 25%, transparent);
+}
+
+.btn-gold {
+  background: linear-gradient(180deg, var(--champagne), var(--gold) 55%, var(--gold-deep));
+  color: var(--obsidian);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.5),
+    inset 0 -1px 0 oklch(0 0 0 / 0.2),
+    0 10px 30px -10px color-mix(in oklab, var(--gold) 45%, transparent);
+}
+
+.serif-num { font-family: var(--font-display); font-feature-settings: "lnum"; }
 
 @keyframes pulse-ring {
   0% { transform: scale(0.9); opacity: 0.7; }
   100% { transform: scale(1.9); opacity: 0; }
 }
-.pulse-ring { animation: pulse-ring 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+.pulse-ring { animation: pulse-ring 2.4s cubic-bezier(0.4,0,0.6,1) infinite; }
 
 @keyframes flicker {
   0%,100% { opacity: 1; }
   50% { opacity: 0.55; }
 }
-.flicker { animation: flicker 1.4s ease-in-out infinite; }
+.flicker { animation: flicker 1.6s ease-in-out infinite; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--gold) 40%, transparent), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3.5s linear infinite;
+}
