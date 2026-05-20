@@ -12,7 +12,7 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { SkeletonUtils } from "three/examples/jsm/utils/SkeletonUtils.js";
+import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { RobotRole } from "@/lib/swarm";
 
 type NodeState = {
