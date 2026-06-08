@@ -33,6 +33,10 @@ function Index() {
   const [progress, setProgress] = useState(0);
   const [builds, setBuilds] = useState<Record<string, BuildLine[]>>({});
   const [buildTitle, setBuildTitle] = useState<string>("");
+  const [generatedHtml, setGeneratedHtml] = useState<string>("");
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"preview" | "code">("preview");
   const logRef = useRef<HTMLDivElement>(null);
   const buildRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
@@ -53,6 +57,37 @@ function Index() {
     setProgress(0);
     setBuilds({});
     setBuildTitle("");
+    setGeneratedHtml("");
+    setGenError(null);
+  }
+
+  async function streamGenerate(directive: string) {
+    setGenerating(true);
+    setGenError(null);
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: directive }),
+      });
+      if (!res.ok || !res.body) {
+        const t = await res.text().catch(() => "");
+        throw new Error(t || `Generation failed (${res.status})`);
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(value, { stream: true });
+        setGeneratedHtml(acc);
+      }
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : "Generation error");
+    } finally {
+      setGenerating(false);
+    }
   }
 
   async function launch(directive: string) {
@@ -63,6 +98,9 @@ function Index() {
     const plan = buildPlan(directive);
     const total = plan.script.length;
 
+    // Kick off real AI generation in parallel with the scripted swarm choreography.
+    const genPromise = streamGenerate(directive);
+
     for (let i = 0; i < plan.script.length; i++) {
       const step = plan.script[i];
       await sleep(stepDelay(step));
@@ -70,6 +108,7 @@ function Index() {
       setProgress(Math.round(((i + 1) / total) * 100));
     }
 
+    await genPromise;
     setPrimeActive(false);
     setRunning(false);
   }
@@ -303,6 +342,104 @@ function Index() {
           </aside>
         </section>
 
+        {/* Live AI build — real website streaming in */}
+        {(generating || generatedHtml || genError) && (
+          <section className="mt-10">
+            <div className="mb-3 flex items-end justify-between">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.4em] text-gold/80">
+                  ◆ live fabrication · real-time
+                </div>
+                <div className="font-display text-2xl">
+                  {generating ? (
+                    <span className="flex items-center gap-3">
+                      <span className="inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: "var(--gold)" }} />
+                      The swarm is writing your build…
+                    </span>
+                  ) : genError ? (
+                    <span style={{ color: "var(--rose)" }}>Generation halted</span>
+                  ) : (
+                    <span>Delivered — your build is live</span>
+                  )}
+                </div>
+                <div className="mt-1 font-mono text-[10px] text-muted-foreground">
+                  {generatedHtml ? `${generatedHtml.length.toLocaleString()} chars streamed` : "awaiting first token…"}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setViewMode("preview")}
+                  className={`rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition ${
+                    viewMode === "preview" ? "border-gold text-gold" : "border-panel-edge text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  preview
+                </button>
+                <button
+                  onClick={() => setViewMode("code")}
+                  className={`rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition ${
+                    viewMode === "code" ? "border-gold text-gold" : "border-panel-edge text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  source
+                </button>
+                {generatedHtml && !generating && (
+                  <a
+                    href={URL.createObjectURL(new Blob([extractHtml(generatedHtml)], { type: "text/html" }))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full border border-gold px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-gold hover:bg-gold/10"
+                  >
+                    open ↗
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div
+              className="glass overflow-hidden rounded-2xl"
+              style={{
+                borderColor: "color-mix(in oklab, var(--gold) 35%, var(--panel-edge))",
+                boxShadow: "0 30px 80px -30px color-mix(in oklab, var(--gold) 35%, transparent)",
+              }}
+            >
+              <div className="flex items-center gap-2 border-b border-panel-edge/70 bg-background/50 px-4 py-2.5">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#ff5f57" }} />
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#febc2e" }} />
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#28c840" }} />
+                <span className="ml-3 flex-1 truncate rounded-md bg-background/60 px-3 py-1 font-mono text-[10px] text-muted-foreground">
+                  swarm://live-build/{Math.abs(hashStr(generatedHtml.slice(0, 40))).toString(36)}
+                </span>
+                {generating && (
+                  <span className="font-mono text-[10px] text-gold">
+                    ● writing
+                  </span>
+                )}
+              </div>
+
+              {viewMode === "preview" ? (
+                <iframe
+                  key={generatedHtml.length > 800 ? "ready" : "stream"}
+                  title="live build"
+                  sandbox="allow-scripts"
+                  srcDoc={generatedHtml ? extractHtml(generatedHtml) : "<html><body style='background:#0a0a0c;color:#888;font-family:monospace;display:grid;place-items:center;height:100vh'>compiling…</body></html>"}
+                  className="h-[700px] w-full bg-white"
+                />
+              ) : (
+                <pre className="max-h-[700px] overflow-auto bg-background/40 p-5 font-mono text-[11px] leading-relaxed text-foreground/80">
+                  <code>{generatedHtml || "// awaiting stream…"}</code>
+                </pre>
+              )}
+            </div>
+
+            {genError && (
+              <div className="mt-3 rounded-xl border px-4 py-3 font-mono text-[11px]" style={{ borderColor: "var(--rose)", color: "var(--rose)" }}>
+                {genError}
+              </div>
+            )}
+          </section>
+        )}
+
         {/* Live build atelier */}
         {nodes.length > 0 && (
           <section className="mt-10">
@@ -435,6 +572,22 @@ function Stat({ label, value, active }: { label: string; value: string; active?:
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+function extractHtml(raw: string): string {
+  if (!raw) return "";
+  let s = raw.trim();
+  const fence = s.match(/```(?:html)?\s*([\s\S]*?)```/i);
+  if (fence) s = fence[1].trim();
+  const i = s.search(/<!doctype html|<html/i);
+  if (i > 0) s = s.slice(i);
+  return s;
+}
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
 }
 
 function stepDelay(step: SwarmStep): number {
