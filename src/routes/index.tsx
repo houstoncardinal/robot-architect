@@ -37,7 +37,7 @@ function Index() {
   const [generatedHtml, setGeneratedHtml] = useState<string>("");
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"preview" | "code">("preview");
+  const [activeDirective, setActiveDirective] = useState("");
   const logRef = useRef<HTMLDivElement>(null);
   const buildRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
@@ -94,6 +94,7 @@ function Index() {
   async function launch(directive: string) {
     if (running) return;
     reset();
+    setActiveDirective(directive);
     setRunning(true);
     setPrimeActive(true);
     const plan = buildPlan(directive);
