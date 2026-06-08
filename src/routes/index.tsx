@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SwarmStage3D } from "@/components/SwarmStage3D";
+import { LiveBuildStudio } from "@/components/LiveBuildStudio";
 import { buildPlan, type SwarmStep } from "@/lib/swarm";
 import type { RobotRole } from "@/lib/swarm";
 
