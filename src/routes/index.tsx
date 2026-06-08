@@ -574,6 +574,22 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function extractHtml(raw: string): string {
+  if (!raw) return "";
+  let s = raw.trim();
+  const fence = s.match(/```(?:html)?\s*([\s\S]*?)```/i);
+  if (fence) s = fence[1].trim();
+  const i = s.search(/<!doctype html|<html/i);
+  if (i > 0) s = s.slice(i);
+  return s;
+}
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
+}
+
 function stepDelay(step: SwarmStep): number {
   switch (step.type) {
     case "spawn":
