@@ -33,6 +33,10 @@ function Index() {
   const [progress, setProgress] = useState(0);
   const [builds, setBuilds] = useState<Record<string, BuildLine[]>>({});
   const [buildTitle, setBuildTitle] = useState<string>("");
+  const [generatedHtml, setGeneratedHtml] = useState<string>("");
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"preview" | "code">("preview");
   const logRef = useRef<HTMLDivElement>(null);
   const buildRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
@@ -53,6 +57,37 @@ function Index() {
     setProgress(0);
     setBuilds({});
     setBuildTitle("");
+    setGeneratedHtml("");
+    setGenError(null);
+  }
+
+  async function streamGenerate(directive: string) {
+    setGenerating(true);
+    setGenError(null);
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: directive }),
+      });
+      if (!res.ok || !res.body) {
+        const t = await res.text().catch(() => "");
+        throw new Error(t || `Generation failed (${res.status})`);
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(value, { stream: true });
+        setGeneratedHtml(acc);
+      }
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : "Generation error");
+    } finally {
+      setGenerating(false);
+    }
   }
 
   async function launch(directive: string) {
@@ -63,6 +98,9 @@ function Index() {
     const plan = buildPlan(directive);
     const total = plan.script.length;
 
+    // Kick off real AI generation in parallel with the scripted swarm choreography.
+    const genPromise = streamGenerate(directive);
+
     for (let i = 0; i < plan.script.length; i++) {
       const step = plan.script[i];
       await sleep(stepDelay(step));
@@ -70,6 +108,7 @@ function Index() {
       setProgress(Math.round(((i + 1) / total) * 100));
     }
 
+    await genPromise;
     setPrimeActive(false);
     setRunning(false);
   }
