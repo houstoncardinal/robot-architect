@@ -308,16 +308,10 @@ function Index() {
           </aside>
         </section>
 
-        {/* Live AI build — luxury real-time studio */}
-        {(generating || generatedHtml || genError) && (
+        {/* SWARM IDE — full in-browser workspace */}
+        {activeDirective && (
           <section className="mt-12">
-            <LiveBuildStudio
-              html={generatedHtml}
-              generating={generating}
-              error={genError}
-              agents={nodes.map((n) => n.robot)}
-              directive={activeDirective}
-            />
+            <IDEStudio directive={activeDirective} autoStartKey={ideKey} />
           </section>
         )}
 
