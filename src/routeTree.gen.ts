@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiGenerateRouteImport } from './routes/api/generate'
+import { Route as ApiIdeGenerateRouteImport } from './routes/api/ide.generate'
+import { Route as ApiIdeChatRouteImport } from './routes/api/ide.chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,49 @@ const ApiGenerateRoute = ApiGenerateRouteImport.update({
   path: '/api/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiIdeGenerateRoute = ApiIdeGenerateRouteImport.update({
+  id: '/api/ide/generate',
+  path: '/api/ide/generate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiIdeChatRoute = ApiIdeChatRouteImport.update({
+  id: '/api/ide/chat',
+  path: '/api/ide/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/generate': typeof ApiGenerateRoute
+  '/api/ide/chat': typeof ApiIdeChatRoute
+  '/api/ide/generate': typeof ApiIdeGenerateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/generate': typeof ApiGenerateRoute
+  '/api/ide/chat': typeof ApiIdeChatRoute
+  '/api/ide/generate': typeof ApiIdeGenerateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/generate': typeof ApiGenerateRoute
+  '/api/ide/chat': typeof ApiIdeChatRoute
+  '/api/ide/generate': typeof ApiIdeGenerateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/generate'
+  fullPaths: '/' | '/api/generate' | '/api/ide/chat' | '/api/ide/generate'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/generate'
-  id: '__root__' | '/' | '/api/generate'
+  to: '/' | '/api/generate' | '/api/ide/chat' | '/api/ide/generate'
+  id: '__root__' | '/' | '/api/generate' | '/api/ide/chat' | '/api/ide/generate'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiGenerateRoute: typeof ApiGenerateRoute
+  ApiIdeChatRoute: typeof ApiIdeChatRoute
+  ApiIdeGenerateRoute: typeof ApiIdeGenerateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ide/generate': {
+      id: '/api/ide/generate'
+      path: '/api/ide/generate'
+      fullPath: '/api/ide/generate'
+      preLoaderRoute: typeof ApiIdeGenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ide/chat': {
+      id: '/api/ide/chat'
+      path: '/api/ide/chat'
+      fullPath: '/api/ide/chat'
+      preLoaderRoute: typeof ApiIdeChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiGenerateRoute: ApiGenerateRoute,
+  ApiIdeChatRoute: ApiIdeChatRoute,
+  ApiIdeGenerateRoute: ApiIdeGenerateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

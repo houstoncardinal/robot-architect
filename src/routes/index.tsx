@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SwarmStage3D } from "@/components/SwarmStage3D";
-import { LiveBuildStudio } from "@/components/LiveBuildStudio";
+import { IDEStudio } from "@/components/IDEStudio";
 import { buildPlan, type SwarmStep } from "@/lib/swarm";
 import type { RobotRole } from "@/lib/swarm";
 
@@ -34,10 +34,8 @@ function Index() {
   const [progress, setProgress] = useState(0);
   const [builds, setBuilds] = useState<Record<string, BuildLine[]>>({});
   const [buildTitle, setBuildTitle] = useState<string>("");
-  const [generatedHtml, setGeneratedHtml] = useState<string>("");
-  const [generating, setGenerating] = useState(false);
-  const [genError, setGenError] = useState<string | null>(null);
   const [activeDirective, setActiveDirective] = useState("");
+  const [ideKey, setIdeKey] = useState(0);
   const logRef = useRef<HTMLDivElement>(null);
   const buildRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
@@ -58,50 +56,17 @@ function Index() {
     setProgress(0);
     setBuilds({});
     setBuildTitle("");
-    setGeneratedHtml("");
-    setGenError(null);
-  }
-
-  async function streamGenerate(directive: string) {
-    setGenerating(true);
-    setGenError(null);
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: directive }),
-      });
-      if (!res.ok || !res.body) {
-        const t = await res.text().catch(() => "");
-        throw new Error(t || `Generation failed (${res.status})`);
-      }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let acc = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        acc += decoder.decode(value, { stream: true });
-        setGeneratedHtml(acc);
-      }
-    } catch (e) {
-      setGenError(e instanceof Error ? e.message : "Generation error");
-    } finally {
-      setGenerating(false);
-    }
   }
 
   async function launch(directive: string) {
     if (running) return;
     reset();
     setActiveDirective(directive);
+    setIdeKey((k) => k + 1);
     setRunning(true);
     setPrimeActive(true);
     const plan = buildPlan(directive);
     const total = plan.script.length;
-
-    // Kick off real AI generation in parallel with the scripted swarm choreography.
-    const genPromise = streamGenerate(directive);
 
     for (let i = 0; i < plan.script.length; i++) {
       const step = plan.script[i];
@@ -110,7 +75,6 @@ function Index() {
       setProgress(Math.round(((i + 1) / total) * 100));
     }
 
-    await genPromise;
     setPrimeActive(false);
     setRunning(false);
   }
@@ -344,16 +308,10 @@ function Index() {
           </aside>
         </section>
 
-        {/* Live AI build — luxury real-time studio */}
-        {(generating || generatedHtml || genError) && (
+        {/* SWARM IDE — full in-browser workspace */}
+        {activeDirective && (
           <section className="mt-12">
-            <LiveBuildStudio
-              html={generatedHtml}
-              generating={generating}
-              error={genError}
-              agents={nodes.map((n) => n.robot)}
-              directive={activeDirective}
-            />
+            <IDEStudio directive={activeDirective} autoStartKey={ideKey} />
           </section>
         )}
 
